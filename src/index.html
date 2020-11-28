@@ -16,16 +16,31 @@
 </head>
 
 <body>
-    <a href="#" onclick="unload()">Unload</a>
-    <a href="#" onclick="switchVideo()">switchVideo</a>
-    <div id="audioOutputSelectWrapper" style="display: none;">
-        Change audio output device
-        <select id="audioOutputSelect" onchange="changeAudioOutput(this)"></select>
+    <div class="col-md-12">
+        <div class="form-inline">
+            <span class="label label-success" id="broadcastingInfo"
+                style="font-size: 14px; display: none">Connected</span>
+        </div>
+        <div class="form-check form-check-inline mt-2">
+            <button id="turn_off_camera_button" class="btn btn-primary" onclick="turnOffLocalCamera()">Turn off Camera</button>
+            <button id="turn_on_camera_button" disabled class="btn btn-primary" onclick="turnOnLocalCamera()">Turn on Camera</button>
+
+            <button id="mute_mic_button" class="btn btn-primary" onclick="muteLocalMic()">Mute Local Mic</button>
+            <button id="unmute_mic_button" disabled class="btn btn-primary" onclick="unmuteLocalMic()">Unmute Local Mic</button>
+
+            <button id="record_start_button" class="btn btn-primary" onclick="startRecord()">Record Start</button>
+            <button id="record_stop_button" disabled class="btn btn-primary" onclick="stopRecord()">Record Stop</button>
+        </div>
+
+        <div class="form-check form-check-inline mt-2">
+            <button id="video_switch_button" class="btn btn-primary" onclick="switchVideo()">Screen Share</button>
+            <select id="audioOutputSelect" onchange="changeAudioOutput(this)"></select>
+        </div>
     </div>
     <video id="currentVideo" autoplay="true"></video>
     <audio id="currentAudio" autoplay="true" muted="true"></audio>
     <div id="videoitem_area">
-        <div class ="videoitem" id="local_area">
+        <div class="videoitem" id="local_area">
             <div class="title_div">
                 <label class="title_lab">Local User</label>
             </div>

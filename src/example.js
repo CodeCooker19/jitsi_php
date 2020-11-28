@@ -34,6 +34,10 @@ let localTracks = [];
 const remoteTracks = {};
 let currentSpeakerId = null;
 const audioCriticalLevel = 0.004;
+let isVideo = true;
+let isMicMuted = false;
+let isCameraOff = false;
+let isRecord = false;
 
 /**
  * Handles local tracks.
@@ -68,9 +72,9 @@ function onLocalTracks(tracks) {
             //     `<audio autoplay='1' muted='true' id='localAudio' />`);
             localTracks[i].attach($(`#localAudio`)[0]);
         }
-        // if (isJoined) {
-        //     room.addTrack(localTracks[i]);
-        // }
+        if (isJoined) {
+            room.addTrack(localTracks[i]);
+        }
     }
 }
 
@@ -88,7 +92,19 @@ function onRemoteTrack(track) {
     if (!remoteTracks[participant]) {
         remoteTracks[participant] = [];
     }
-    const idx = remoteTracks[participant].push(track);
+
+    let isFind = false;
+    for (let i = 0; i < remoteTracks[participant].length; i++) {
+        if (remoteTracks[participant][i].getType() === track.getType()) {
+            remoteTracks[participant][i] = track;
+            isFind = true;
+            break;
+        }
+    }
+
+    if (isFind === false) {
+        remoteTracks[participant].push(track);
+    }
 
     track.addEventListener(
         JitsiMeetJS.events.track.TRACK_AUDIO_LEVEL_CHANGED,
@@ -156,12 +172,12 @@ function onUserLeft(id) {
         return;
     }
     const tracks = remoteTracks[id];
-    
+
     for (let i = 0; i < tracks.length; i++) {
         const type = tracks[i].getType();
         tracks[i].detach($(`#${id + type}`)[0]);
     }
-    
+
     $(`#${id.toString()}`).remove();
     delete remoteTracks[id];
     console.log('>>>user left2', id);
@@ -180,7 +196,7 @@ function onDominantSpeaker(id) {
 
     console.log(">>>>DominantSpeaker track", remoteTracks[id]);
     for (let i = 0; i < remoteTracks[id].length; i++) {
-        if(remoteTracks[id][i].getType() === "video"){
+        if (remoteTracks[id][i].getType() === "video") {
             remoteTracks[id][i].attach($(`#currentVideo`)[0]);
         }
     }
@@ -196,18 +212,18 @@ function onAudioLevelChanged(userID, audioLeveld) {
         return;
     }
 
-    if(currentSpeakerId === userID){
+    if (currentSpeakerId === userID) {
         return;
     }
 
-    if(audioLeveld < audioCriticalLevel){
+    if (audioLeveld < audioCriticalLevel) {
         return;
     }
 
     currentSpeakerId = userID;
-    console.log(">>>>onAudioLevelChanged", audioLeveld);
+    console.log(">>>>onAudioLevelChanged", audioLeveld, remoteTracks[userID]);
     for (let i = 0; i < remoteTracks[userID].length; i++) {
-        if(remoteTracks[userID][i].getType() === "video"){
+        if (remoteTracks[userID][i].getType() === "video") {
             remoteTracks[userID][i].attach($(`#currentVideo`)[0]);
         }
     }
@@ -236,7 +252,7 @@ function onConnectionSuccess() {
         (userID, displayName) => console.log(`${userID} - ${displayName}`));
     room.on(
         JitsiMeetJS.events.conference.TRACK_AUDIO_LEVEL_CHANGED, onAudioLevelChanged);
-        // (userID, audioLevel) => console.log(`${userID} - ${audioLevel}`));
+    // (userID, audioLevel) => console.log(`${userID} - ${audioLevel}`));
     room.on(
         JitsiMeetJS.events.conference.PHONE_NUMBER_CHANGED,
         () => console.log(`${room.getPhoneNumber()} - ${room.getPhonePin()}`));
@@ -285,13 +301,14 @@ function unload() {
     connection.disconnect();
 }
 
-let isVideo = true;
-
 /**
  *
  */
 function switchVideo() { // eslint-disable-line no-unused-vars
     isVideo = !isVideo;
+    let text = isVideo ? 'Screen Share' : 'Local Camera';
+    $('#video_switch_button').html(text);
+
     if (localTracks[1]) {
         localTracks[1].dispose();
         localTracks.pop();
@@ -307,7 +324,7 @@ function switchVideo() { // eslint-disable-line no-unused-vars
             localTracks[1].addEventListener(
                 JitsiMeetJS.events.track.LOCAL_TRACK_STOPPED,
                 () => console.log('local track stoped'));
-            localTracks[1].attach($('#localVideo1')[0]);
+            localTracks[1].attach($('#localVideo')[0]);
             room.addTrack(localTracks[1]);
         })
         .catch(error => console.log(error));
@@ -321,6 +338,94 @@ function changeAudioOutput(selected) { // eslint-disable-line no-unused-vars
     JitsiMeetJS.mediaDevices.setAudioOutputDevice(selected.value);
 }
 
+function turnOffLocalCamera() {
+    isCameraOff = true;
+    handleCameraButtons();
+}
+
+function turnOnLocalCamera() {
+    isCameraOff = false;
+    handleCameraButtons();
+}
+
+function handleCameraButtons() {
+    let track = null;
+    for (let i = 0; i < localTracks.length; i++) {
+        if (localTracks[i].getType() === "video") {
+            track = localTracks[i];
+        }
+    }
+
+    if (isCameraOff) {
+        $('#turn_off_camera_button').attr('disabled', true);
+        $('#turn_on_camera_button').attr('disabled', false);
+        if(track !== null){
+            track.mute();
+        }
+        
+    } else {
+        $('#turn_off_camera_button').attr('disabled', false);
+        $('#turn_on_camera_button').attr('disabled', true);
+        if(track !== null){
+            track.unmute();
+        }
+    }
+}
+
+function muteLocalMic() {
+    isMicMuted = true;
+    handleMicButtons();
+}
+
+function unmuteLocalMic() {
+    isMicMuted = false;
+    handleMicButtons();
+}
+
+function handleMicButtons() {
+    let track = null;
+    for (let i = 0; i < localTracks.length; i++) {
+        if (localTracks[i].getType() === "audio") {
+            track = localTracks[i];
+        }
+    }
+
+    if (isMicMuted) {
+        $('#mute_mic_button').attr('disabled', true);
+        $('#unmute_mic_button').attr('disabled', false);
+        if(track !== null){
+            track.mute();
+        }
+    } else {
+        $('#mute_mic_button').attr('disabled', false);
+        $('#unmute_mic_button').attr('disabled', true);
+        if(track !== null){
+            track.unmute();
+        }
+    }
+}
+
+function startRecord() {
+    isRecord = true;
+    handleRecordButtons();
+}
+
+function stopRecord() {
+    isRecord = false;
+    handleRecordButtons();
+}
+
+function handleRecordButtons() {
+    if (isRecord) {
+        $('#record_start_button').attr('disabled', true);
+        $('#record_stop_button').attr('disabled', false);
+    } else {
+        $('#record_start_button').attr('disabled', false);
+        $('#record_stop_button').attr('disabled', true);
+    }
+}
+
+//jitsi serer config
 $(window).bind('beforeunload', unload);
 $(window).bind('unload', unload);
 
