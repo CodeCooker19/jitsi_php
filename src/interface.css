@@ -1,0 +1,52 @@
+#currentVideo {
+    width: 100%;
+    background: black;
+    height: 90vh;
+    margin-top: 10px;
+}
+#videoitem_area {
+    width: 25%;
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+}
+#localVideo {
+    width: 90%;
+}
+.videoitem {
+    justify-content: center;
+    display: flex;
+    height: 20vh;
+}
+#remote_area {
+    height: 80vh;
+    width: 100%;
+    flex-direction: column;
+    overflow: auto;
+}
+.title_div {
+    display: flex;
+    width: 100%;
+    position: absolute;
+    align-items: center;
+    justify-content: center;
+    background: #d8b7b736;
+}
+.title_lab {
+    color: white;
+    font-weight: bold;
+    font-size: 20px;
+}
+.remoteitem {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    margin: 10px 0;
+}
+.remotevideo {
+    height: 20vh;
+    width: 90%;
+}

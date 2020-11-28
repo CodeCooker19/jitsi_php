@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <link href="./interface.css" rel="stylesheet" />
+    <script src="libs/jquery-2.1.1.min.js"></script>
+    <!-- <script src="libs/strophe/strophe.js"></script>
+    <script src="libs/strophe/strophe.disco.min.js?v=1"></script> -->
+    <script src='https://meet.jit.si/external_api.js'></script>
+    <script src="https://cdn.jsdelivr.net/npm/strophe.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/strophejs-plugin-disco/lib/strophe.disco.js?v=1"></script>
+    <script src="https://meet.jit.si/libs/lib-jitsi-meet.min.js"></script>
+    <script src="example.js"></script>
+</head>
+
+<body>
+    <a href="#" onclick="unload()">Unload</a>
+    <a href="#" onclick="switchVideo()">switchVideo</a>
+    <div id="audioOutputSelectWrapper" style="display: none;">
+        Change audio output device
+        <select id="audioOutputSelect" onchange="changeAudioOutput(this)"></select>
+    </div>
+    <video id="currentVideo" autoplay="true"></video>
+    <audio id="currentAudio" autoplay="true" muted="true"></audio>
+    <div id="videoitem_area">
+        <div class ="videoitem" id="local_area">
+            <div class="title_div">
+                <label class="title_lab">Local User</label>
+            </div>
+            <video id="localVideo" autoplay="true"></video>
+            <audio id="localAudio" autoplay="true" muted="true"></audio>
+        </div>
+        <div id="remote_area">
+            <div class="title_div">
+                <label class="title_lab">Remote Users</label>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
