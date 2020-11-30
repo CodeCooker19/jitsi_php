@@ -33,7 +33,7 @@ let room = null;
 let localTracks = [];
 const remoteTracks = {};
 let currentSpeakerId = null;
-const audioCriticalLevel = 0.01;
+const audioCriticalLevel = 0.1;
 let isVideo = true;
 let isMicMuted = false;
 let isCameraOff = false;
@@ -215,10 +215,6 @@ function onDominantSpeaker(id) {
  * @param audioLevel
  */
 function onAudioLevelChanged(userID, audioLeveld) {
-    if (!remoteTracks[userID]) {
-        return;
-    }
-
     if (currentSpeakerId === userID) {
         return;
     }
@@ -227,13 +223,24 @@ function onAudioLevelChanged(userID, audioLeveld) {
         return;
     }
 
-    currentSpeakerId = userID;
-    console.log(">>>>onAudioLevelChanged", audioLeveld, remoteTracks[userID]);
-    for (let i = 0; i < remoteTracks[userID].length; i++) {
-        if (remoteTracks[userID][i].getType() === "video") {
-            remoteTracks[userID][i].attach($(`#currentVideo`)[0]);
-        }
+    if(localTracks[1].getParticipantId() === userID){
+        console.log(">>>>local audio level changed------");
+        currentSpeakerId = userID;
+        localTracks[1].attach($(`#currentVideo`)[0]);
     }
+    else{
+        if (!remoteTracks[userID]) {
+            return;
+        }
+    
+        currentSpeakerId = userID;
+        console.log(">>>>onAudioLevelChanged", audioLeveld, remoteTracks[userID]);
+        for (let i = 0; i < remoteTracks[userID].length; i++) {
+            if (remoteTracks[userID][i].getType() === "video") {
+                remoteTracks[userID][i].attach($(`#currentVideo`)[0]);
+            }
+        }
+    }   
 }
 
 /**
