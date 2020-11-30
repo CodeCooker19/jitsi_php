@@ -35,7 +35,12 @@
     position: absolute;
     align-items: center;
     justify-content: center;
+}
+.local_title{
     background: #1669b1a3;
+}
+.remote_title{
+    background:#dcc41ba3;
 }
 .title_lab {
     color: white;

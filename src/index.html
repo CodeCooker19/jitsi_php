@@ -40,15 +40,17 @@
     <video id="currentVideo" autoplay="true"></video>
     <audio id="currentAudio" autoplay="true" muted="true"></audio>
     <div id="videoitem_area">
-        <div class="videoitem" id="local_area">
-            <div class="title_div">
+        <div id="local_area">
+            <div class="title_div local_title">
                 <label class="title_lab">Local User</label>
             </div>
-            <video id="localVideo" autoplay="true"></video>
-            <audio id="localAudio" autoplay="true" muted="true"></audio>
+            <div class="videoitem" onclick="selectedLocalTrack()">
+                <video id="localVideo" autoplay="true"></video>
+                <audio id="localAudio" autoplay="true" muted="true"></audio>
+            </div>
         </div>
         <div id="remote_area">
-            <div class="title_div">
+            <div class="title_div remote_title">
                 <label class="title_lab">Remote Users</label>
             </div>
         </div>

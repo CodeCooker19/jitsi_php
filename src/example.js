@@ -33,7 +33,7 @@ let room = null;
 let localTracks = [];
 const remoteTracks = {};
 let currentSpeakerId = null;
-const audioCriticalLevel = 0.004;
+const audioCriticalLevel = 0.01;
 let isVideo = true;
 let isMicMuted = false;
 let isCameraOff = false;
@@ -130,7 +130,7 @@ function onRemoteTrack(track) {
 
     if ($(`#${participant}`).length === 0) {
         console.log(">>>$(`#${participant}`).length", $(`#${participant}`).length);
-        $('#remote_area').append(`<div class='remoteitem' id='${participant}'></div>`)
+        $('#remote_area').append(`<div class='remoteitem' id='${participant}' onclick='selectedRemoteTrack(this.id)'></div>`)
     }
 
     const id = participant + track.getType();
@@ -204,6 +204,7 @@ function onDominantSpeaker(id) {
     for (let i = 0; i < remoteTracks[id].length; i++) {
         if (remoteTracks[id][i].getType() === "video") {
             remoteTracks[id][i].attach($(`#currentVideo`)[0]);
+            currentSpeakerId = id;
         }
     }
 }
@@ -330,17 +331,18 @@ function switchVideo() { // eslint-disable-line no-unused-vars
                 JitsiMeetJS.events.track.TRACK_MUTE_CHANGED,
                 () => console.log('>>>>>>local track muted'));
             localTracks[1].addEventListener(
-                JitsiMeetJS.events.track.LOCAL_TRACK_STOPPED, () => { isVideo === false ? stopLocalTrack() : null });
+                JitsiMeetJS.events.track.LOCAL_TRACK_STOPPED, () => { isVideo === false ? stopScreenShare() : null });
             // () => console.log('>>>>>>local track stoped'));
             localTracks[1].attach($('#localVideo')[0]);
             localTracks[1].attach($('#currentVideo')[0]);
+            currentSpeakerId = localTracks[1].getParticipantId();
             room.addTrack(localTracks[1]);
         })
-        .catch(error => stopLocalTrack());
+        .catch(error => stopScreenShare());
 }
 
 
-function stopLocalTrack() {
+function stopScreenShare() {
     console.log(">>>>>>>>> stoped screen share");
     isVideo = true;
     let text = 'Screen Share';
@@ -365,6 +367,7 @@ function stopLocalTrack() {
                 () => console.log('>>>>>>local track stoped'));
             localTracks[1].attach($('#localVideo')[0]);
             localTracks[1].attach($('#currentVideo')[0]);
+            currentSpeakerId = localTracks[1].getParticipantId();
             room.addTrack(localTracks[1]);
         })
         .catch(error => console.log('>>>>>error', error));
@@ -461,6 +464,35 @@ function handleRecordButtons() {
     } else {
         $('#record_start_button').attr('disabled', false);
         $('#record_stop_button').attr('disabled', true);
+    }
+}
+
+function selectedLocalTrack() {
+    if (currentSpeakerId == localTracks[1].getParticipantId()) {
+        return;
+    }
+
+    console.log(">>>>selectedLocalTrack clicked");
+    currentSpeakerId = localTracks[1].getParticipantId();
+    localTracks[1].attach($('#currentVideo')[0]);
+}
+
+function selectedRemoteTrack(id) {
+    console.log(">>>>selectedRemoteTrack clicked");
+    if (currentSpeakerId == id) {
+        return;
+    }
+
+    if (!remoteTracks[id]) {
+        return;
+    }
+
+    console.log(">>>>selectedRemoteTrack track", remoteTracks[id]);
+    for (let i = 0; i < remoteTracks[id].length; i++) {
+        if (remoteTracks[id][i].getType() === "video") {
+            remoteTracks[id][i].attach($(`#currentVideo`)[0]);
+            currentSpeakerId = id;
+        }
     }
 }
 
