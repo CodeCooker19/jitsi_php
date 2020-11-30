@@ -15,6 +15,8 @@
 }
 #localVideo {
     width: 90%;
+    border: 3px solid deepskyblue;
+    background: black;
 }
 .videoitem {
     justify-content: center;
@@ -49,4 +51,6 @@
 }
 .remotevideo {
     width: 90%;
+    border: 3px solid yellow;
+    background: black;
 }

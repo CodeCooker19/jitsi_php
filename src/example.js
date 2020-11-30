@@ -67,6 +67,7 @@ function onLocalTracks(tracks) {
         if (localTracks[i].getType() === 'video') {
             // $('body').append(`<video autoplay='1' id='localVideo' />`);
             localTracks[i].attach($(`#localVideo`)[0]);
+            localTracks[i].attach($(`#currentVideo`)[0]);
         } else {
             // $('body').append(
             //     `<audio autoplay='1' muted='true' id='localAudio' />`);
@@ -88,6 +89,11 @@ function onRemoteTrack(track) {
         return;
     }
     const participant = track.getParticipantId();
+    const type = track.getType();
+
+    if (type === 'video' && participant == currentSpeakerId) {
+        track.attach($(`#currentVideo`)[0]);
+    }
 
     if (!remoteTracks[participant]) {
         remoteTracks[participant] = [];
@@ -313,23 +319,56 @@ function switchVideo() { // eslint-disable-line no-unused-vars
         localTracks[1].dispose();
         localTracks.pop();
     }
+
     JitsiMeetJS.createLocalTracks({
         devices: [isVideo ? 'video' : 'desktop']
     })
         .then(tracks => {
+            console.log('>>>>>>switchVideo', tracks);
             localTracks.push(tracks[0]);
             localTracks[1].addEventListener(
                 JitsiMeetJS.events.track.TRACK_MUTE_CHANGED,
-                () => console.log('local track muted'));
+                () => console.log('>>>>>>local track muted'));
             localTracks[1].addEventListener(
-                JitsiMeetJS.events.track.LOCAL_TRACK_STOPPED,
-                () => console.log('local track stoped'));
+                JitsiMeetJS.events.track.LOCAL_TRACK_STOPPED, () => { isVideo === false ? stopLocalTrack() : null });
+            // () => console.log('>>>>>>local track stoped'));
             localTracks[1].attach($('#localVideo')[0]);
+            localTracks[1].attach($('#currentVideo')[0]);
             room.addTrack(localTracks[1]);
         })
-        .catch(error => console.log(error));
+        .catch(error => stopLocalTrack());
 }
 
+
+function stopLocalTrack() {
+    console.log(">>>>>>>>> stoped screen share");
+    isVideo = true;
+    let text = 'Screen Share';
+    $('#video_switch_button').html(text);
+
+    if (localTracks[1]) {
+        localTracks[1].dispose();
+        localTracks.pop();
+    }
+
+    JitsiMeetJS.createLocalTracks({
+        devices: ['video']
+    })
+        .then(tracks => {
+            console.log('>>>>>>stopLocalTrack', tracks);
+            localTracks.push(tracks[0]);
+            localTracks[1].addEventListener(
+                JitsiMeetJS.events.track.TRACK_MUTE_CHANGED,
+                () => console.log('>>>>>>local track muted'));
+            localTracks[1].addEventListener(
+                JitsiMeetJS.events.track.LOCAL_TRACK_STOPPED,
+                () => console.log('>>>>>>local track stoped'));
+            localTracks[1].attach($('#localVideo')[0]);
+            localTracks[1].attach($('#currentVideo')[0]);
+            room.addTrack(localTracks[1]);
+        })
+        .catch(error => console.log('>>>>>error', error));
+}
 /**
  *
  * @param selected
@@ -359,14 +398,14 @@ function handleCameraButtons() {
     if (isCameraOff) {
         $('#turn_off_camera_button').attr('disabled', true);
         $('#turn_on_camera_button').attr('disabled', false);
-        if(track !== null){
+        if (track !== null) {
             track.mute();
         }
-        
+
     } else {
         $('#turn_off_camera_button').attr('disabled', false);
         $('#turn_on_camera_button').attr('disabled', true);
-        if(track !== null){
+        if (track !== null) {
             track.unmute();
         }
     }
@@ -393,13 +432,13 @@ function handleMicButtons() {
     if (isMicMuted) {
         $('#mute_mic_button').attr('disabled', true);
         $('#unmute_mic_button').attr('disabled', false);
-        if(track !== null){
+        if (track !== null) {
             track.mute();
         }
     } else {
         $('#mute_mic_button').attr('disabled', false);
         $('#unmute_mic_button').attr('disabled', true);
-        if(track !== null){
+        if (track !== null) {
             track.unmute();
         }
     }
