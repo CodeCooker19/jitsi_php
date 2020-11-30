@@ -311,72 +311,62 @@ function unload() {
 /**
  *
  */
-function switchVideo() { // eslint-disable-line no-unused-vars
-    isVideo = !isVideo;
-    let text = isVideo ? 'Screen Share' : 'Local Camera';
-    $('#video_switch_button').html(text);
-
+function showScreenShare() { // eslint-disable-line no-unused-vars
     if (localTracks[1]) {
         localTracks[1].dispose();
         localTracks.pop();
     }
-
     JitsiMeetJS.createLocalTracks({
-        devices: [isVideo ? 'video' : 'desktop']
+        devices: [ 'desktop' ]
     })
         .then(tracks => {
-            console.log('>>>>>>switchVideo', tracks);
+            console.log(">>>>>showScreenShare", tracks);
             localTracks.push(tracks[0]);
             localTracks[1].addEventListener(
                 JitsiMeetJS.events.track.TRACK_MUTE_CHANGED,
-                () => console.log('>>>>>>local track muted'));
-            localTracks[1].addEventListener(
-                JitsiMeetJS.events.track.LOCAL_TRACK_STOPPED, () => { isVideo === false ? stopScreenShare() : null });
-            // () => console.log('>>>>>>local track stoped'));
-            localTracks[1].attach($('#localVideo')[0]);
-            localTracks[1].attach($('#currentVideo')[0]);
-            currentSpeakerId = localTracks[1].getParticipantId();
-            room.addTrack(localTracks[1]);
-        })
-        .catch(error => stopScreenShare());
-}
-
-
-function stopScreenShare() {
-    console.log(">>>>>>>>> stoped screen share");
-    isVideo = true;
-    let text = 'Screen Share';
-    $('#video_switch_button').html(text);
-
-    if (localTracks[1]) {
-        localTracks[1].dispose();
-        localTracks.pop();
-    }
-
-    JitsiMeetJS.createLocalTracks({
-        devices: ['video']
-    })
-        .then(tracks => {
-            console.log('>>>>>>stopLocalTrack', tracks);
-            localTracks.push(tracks[0]);
-            localTracks[1].addEventListener(
-                JitsiMeetJS.events.track.TRACK_MUTE_CHANGED,
-                () => console.log('>>>>>>local track muted'));
+                () => console.log('local track muted'));
             localTracks[1].addEventListener(
                 JitsiMeetJS.events.track.LOCAL_TRACK_STOPPED,
-                () => console.log('>>>>>>local track stoped'));
+                () => showLocalCamera());
+
             localTracks[1].attach($('#localVideo')[0]);
             localTracks[1].attach($('#currentVideo')[0]);
             currentSpeakerId = localTracks[1].getParticipantId();
             room.addTrack(localTracks[1]);
         })
-        .catch(error => console.log('>>>>>error', error));
+        .catch(error => showLocalCamera());
+}
+
+function showLocalCamera() {
+    if (localTracks[1]) {
+        localTracks[1].dispose();
+        localTracks.pop();
+    }
+    JitsiMeetJS.createLocalTracks({
+        devices: [ 'video' ]
+    })
+        .then(tracks => {
+            localTracks.push(tracks[0]);
+            localTracks[1].addEventListener(
+                JitsiMeetJS.events.track.TRACK_MUTE_CHANGED,
+                () => console.log('local track muted'));
+            localTracks[1].addEventListener(
+                JitsiMeetJS.events.track.LOCAL_TRACK_STOPPED,
+                () => console.log(">>>>>showLocalCamera stop"));
+
+            localTracks[1].attach($('#localVideo')[0]);
+            localTracks[1].attach($('#currentVideo')[0]);
+            currentSpeakerId = localTracks[1].getParticipantId();
+            room.addTrack(localTracks[1]);
+        })
+        .catch(error => console.log(">>>>>showLocalCamera error", error));
 }
 /**
  *
  * @param selected
  */
 function changeAudioOutput(selected) { // eslint-disable-line no-unused-vars
+    console.log(">>>>>>changeAudioOutput", selected.value);
     JitsiMeetJS.mediaDevices.setAudioOutputDevice(selected.value);
 }
 
@@ -468,11 +458,10 @@ function handleRecordButtons() {
 }
 
 function selectedLocalTrack() {
+    console.log(">>>>selectedLocalTrack clicked");
     if (currentSpeakerId == localTracks[1].getParticipantId()) {
         return;
     }
-
-    console.log(">>>>selectedLocalTrack clicked");
     currentSpeakerId = localTracks[1].getParticipantId();
     localTracks[1].attach($('#currentVideo')[0]);
 }

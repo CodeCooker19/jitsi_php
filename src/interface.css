@@ -1,3 +1,6 @@
+.line_div{
+    margin-top: 3px;
+}
 #currentVideo {
     width: 100%;
     background: black;
