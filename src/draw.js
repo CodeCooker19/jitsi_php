@@ -26,9 +26,18 @@ var downEvent = isTouchSupported ? 'touchstart' : (isPointerSupported ? 'pointer
 var moveEvent = isTouchSupported ? 'touchmove' : (isPointerSupported ? 'pointermove' : (isMSPointerSupported ? 'MSPointerMove' : 'mousemove'));
 var upEvent = isTouchSupported ? 'touchend' : (isPointerSupported ? 'pointerup' : (isMSPointerSupported ? 'MSPointerUp' : 'mouseup'));
 
+window.addEventListener("resize", displayWindowSize);
 canvas.addEventListener(downEvent, startDraw, false);
 canvas.addEventListener(moveEvent, draw, false);
 canvas.addEventListener(upEvent, endDraw, false);
+
+function displayWindowSize() {
+    const context = canvas.getContext('2d');
+    let temp = context.getImageData(canvas.width, canvas.height)
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight * 0.9;
+    context.putImageData(temp,0,0)
+}
 
 function drawBoard() {
     isDrawFlag = true;
@@ -81,7 +90,7 @@ function draw(e) {
 
 function startDraw(e) {
     e.preventDefault();
-    if(isDrawFlag === true){
+    if (isDrawFlag === true) {
         isActive = true;
     }
 }
