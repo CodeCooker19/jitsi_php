@@ -32,6 +32,7 @@ let room = null;
 
 let localTracks = [];
 const remoteTracks = {};
+const remoteHands = {};
 let currentSpeakerId = null;
 const audioCriticalLevel = 0.1;
 let isVideo = true;
@@ -132,6 +133,11 @@ function onRemoteTrack(track) {
     if ($(`#${participant}`).length === 0) {
         console.log(">>>$(`#${participant}`).length", $(`#${participant}`).length);
         $('#remote_area').append(`<div class='remoteitem' id='${participant}' onclick='selectedRemoteTrack(this.id)'><img class="hand" src=''></div>`)
+    }
+
+    if (remoteHands[participant]) {
+        let img = remoteHands[participant][0] ? './assets/image/hand.png' : '';
+        $(`#${participant} .hand`).attr('src', img);
     }
 
     const id = participant + track.getType();
@@ -255,7 +261,7 @@ function onConnectionSuccess() {
         JitsiMeetJS.events.conference.CONFERENCE_JOINED,
         onConferenceJoined);
     room.on(JitsiMeetJS.events.conference.USER_JOINED, id => {
-        console.log('user join');
+        console.log('>>>>>>user join', id);
         remoteTracks[id] = [];
     });
     room.on(JitsiMeetJS.events.conference.USER_LEFT, onUserLeft);
@@ -387,23 +393,34 @@ function changeAudioOutput(selected) { // eslint-disable-line no-unused-vars
  * @param newValue
  */
 function handleParticipantPropertyChange(participant, propertyName, oldValue, newValue) {
-    console.log(">>>>>handleParticipantPropertyChange", participant.getId(), newValue);
-    console.log(">>>>>handleParticipantPropertyChange", localTracks[1], localTracks[1].getParticipantId(), localTracks[1].getId());
-    let participantId = participant.getId();
-    if (participantId === localTracks[1].getParticipantId() || newValue === "none") {
+    if (newValue === "none") {
         return;
     }
 
+    let flag;
     switch (newValue) {
         case "handup":
-            setRemoteHandImage(participantId, true);
+            flag = true;
             break;
         case "handoff":
-            setRemoteHandImage(participantId, false);
+            flag = false;
             break;
         default:
-            break;
+            return;
     }
+
+    console.log(">>>>>>handleParticipantPropertyChange", participant.getId(), newValue);
+    let participantId = participant.getId();
+
+    if (!remoteHands[participantId]) {
+        remoteHands[participantId] = [];
+        remoteHands[participantId].push(flag);
+    }
+    else {
+        remoteHands[participantId][0] = flag;
+    }
+
+    setRemoteHandImage(participantId, true);
 }
 
 function turnOffLocalCamera() {
