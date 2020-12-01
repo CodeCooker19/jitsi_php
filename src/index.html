@@ -34,6 +34,9 @@
 
             <button id="record_start_button" class="btn btn-primary" onclick="startRecord()">Record Start</button>
             <button id="record_stop_button" disabled class="btn btn-primary" onclick="stopRecord()">Record Stop</button>
+            <button id="hand_button" class="btn btn-primary" onclick="handleHandup()">
+                <img id="hand_img" src="./assets/image/hand.png"/>
+            </button>
         </div>
 
         <div class="form-check form-check-inline mt-2 line_div">
@@ -52,6 +55,7 @@
             <div class="videoitem" onclick="selectedLocalTrack()">
                 <video id="localVideo" autoplay="true"></video>
                 <audio id="localAudio" autoplay="true" muted="true"></audio>
+                <img class="hand" src=''>
             </div>
         </div>
         <div id="remote_area">

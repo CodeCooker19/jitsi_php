@@ -7,6 +7,9 @@
     height: 90vh;
     margin-top: 10px;
 }
+#hand_img{
+    width: 20px;
+}
 #videoitem_area {
     width: 200px;
     position: absolute;
@@ -25,6 +28,7 @@
     justify-content: center;
     display: flex;
     height: 150px;
+    position: relative;
 }
 #remote_area {
     height: 80vh;
@@ -38,6 +42,7 @@
     position: absolute;
     align-items: center;
     justify-content: center;
+    z-index: 1;
 }
 .local_title{
     background: #1669b1a3;
@@ -56,9 +61,15 @@
     height: 125px;
     justify-content: center;
     margin: 10px 0;
+    position: relative;
 }
 .remotevideo {
     width: 90%;
     border: 3px solid yellow;
     background: black;
+}
+.hand {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
 }

@@ -38,6 +38,7 @@ let isVideo = true;
 let isMicMuted = false;
 let isCameraOff = false;
 let isRecord = false;
+let isHanup = false;
 
 /**
  * Handles local tracks.
@@ -130,7 +131,7 @@ function onRemoteTrack(track) {
 
     if ($(`#${participant}`).length === 0) {
         console.log(">>>$(`#${participant}`).length", $(`#${participant}`).length);
-        $('#remote_area').append(`<div class='remoteitem' id='${participant}' onclick='selectedRemoteTrack(this.id)'></div>`)
+        $('#remote_area').append(`<div class='remoteitem' id='${participant}' onclick='selectedRemoteTrack(this.id)'><img class="hand" src=''></div>`)
     }
 
     const id = participant + track.getType();
@@ -223,16 +224,16 @@ function onAudioLevelChanged(userID, audioLeveld) {
         return;
     }
 
-    if(localTracks[1].getParticipantId() === userID){
+    if (localTracks[1].getParticipantId() === userID) {
         console.log(">>>>local audio level changed------");
         currentSpeakerId = userID;
         localTracks[1].attach($(`#currentVideo`)[0]);
     }
-    else{
+    else {
         if (!remoteTracks[userID]) {
             return;
         }
-    
+
         currentSpeakerId = userID;
         console.log(">>>>onAudioLevelChanged", audioLeveld, remoteTracks[userID]);
         for (let i = 0; i < remoteTracks[userID].length; i++) {
@@ -240,7 +241,7 @@ function onAudioLevelChanged(userID, audioLeveld) {
                 remoteTracks[userID][i].attach($(`#currentVideo`)[0]);
             }
         }
-    }   
+    }
 }
 
 /**
@@ -271,6 +272,7 @@ function onConnectionSuccess() {
         JitsiMeetJS.events.conference.PHONE_NUMBER_CHANGED,
         () => console.log(`${room.getPhoneNumber()} - ${room.getPhonePin()}`));
     room.on(JitsiMeetJS.events.conference.DOMINANT_SPEAKER_CHANGED, onDominantSpeaker);
+    room.on(JitsiMeetJS.events.conference.PARTICIPANT_PROPERTY_CHANGED, handleParticipantPropertyChange);
     room.join();
 }
 
@@ -324,7 +326,7 @@ function showScreenShare() { // eslint-disable-line no-unused-vars
         localTracks.pop();
     }
     JitsiMeetJS.createLocalTracks({
-        devices: [ 'desktop' ]
+        devices: ['desktop']
     })
         .then(tracks => {
             console.log(">>>>>showScreenShare", tracks);
@@ -350,7 +352,7 @@ function showLocalCamera() {
         localTracks.pop();
     }
     JitsiMeetJS.createLocalTracks({
-        devices: [ 'video' ]
+        devices: ['video']
     })
         .then(tracks => {
             localTracks.push(tracks[0]);
@@ -375,6 +377,33 @@ function showLocalCamera() {
 function changeAudioOutput(selected) { // eslint-disable-line no-unused-vars
     console.log(">>>>>>changeAudioOutput", selected.value);
     JitsiMeetJS.mediaDevices.setAudioOutputDevice(selected.value);
+}
+
+/**
+ *
+ * @param participant
+ * @param propertyName
+ * @param oldValue
+ * @param newValue
+ */
+function handleParticipantPropertyChange(participant, propertyName, oldValue, newValue) {
+    console.log(">>>>>handleParticipantPropertyChange", participant.getId(), newValue);
+    console.log(">>>>>handleParticipantPropertyChange", localTracks[1], localTracks[1].getParticipantId(), localTracks[1].getId());
+    let participantId = participant.getId();
+    if (participantId === localTracks[1].getParticipantId() || newValue === "none") {
+        return;
+    }
+
+    switch (newValue) {
+        case "handup":
+            setRemoteHandImage(participantId, true);
+            break;
+        case "handoff":
+            setRemoteHandImage(participantId, false);
+            break;
+        default:
+            break;
+    }
 }
 
 function turnOffLocalCamera() {
@@ -490,6 +519,47 @@ function selectedRemoteTrack(id) {
             currentSpeakerId = id;
         }
     }
+}
+
+function handleHandup() {
+    console.log(">>>>>clicked hand up", isHanup);
+    isHanup = !isHanup;
+    if (isHanup) {
+        $('#hand_img').attr("src", './assets/image/unhand.png');
+    }
+    else {
+        $('#hand_img').attr("src", './assets/image/hand.png');
+    }
+
+    setLocalHandImage(isHanup);
+}
+
+function setLocalHandImage(flag) {
+    let img = flag ? './assets/image/hand.png' : '';
+
+    if (!localTracks[1]) {
+        return;
+    }
+
+    $('.videoitem').children('img').attr('src', img);
+    if (flag) {
+        room.setLocalParticipantProperty("raised-hand", "none");
+        room.setLocalParticipantProperty("raised-hand", "handup");
+    }
+    else {
+        room.setLocalParticipantProperty("raised-hand", "none");
+        room.setLocalParticipantProperty("raised-hand", "handoff");
+    }
+}
+
+function setRemoteHandImage(participant, flag) {
+    let img = flag ? './assets/image/hand.png' : '';
+
+    if (!remoteTracks[participant]) {
+        return;
+    }
+
+    $(`#${participant} .hand`).attr('src', img);
 }
 
 //jitsi serer config
