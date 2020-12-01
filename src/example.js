@@ -592,6 +592,23 @@ function setRemoteHandImage(participant, flag) {
     $(`#${participant} .hand`).attr('src', img);
 }
 
+function startCanvasStream() {
+    var canvas = document.getElementById('drawCanvas');
+    let canvasTrack = canvas.captureStream(25).getTracks()[0];
+    console.log(">>>>>>>>canvas stream", canvasTrack);
+
+    room.addTrack(canvasTrack);
+
+    navigator.mediaDevices.getUserMedia({video: true})
+      .then(stream => {
+        let canvstrm = canvas.captureStream();
+        // get track from the canvas stream and add to the user media stream
+        let canvstrmtrack = canvstrm.getTracks()[0]
+        stream.addTrack(canvstrmtrack);
+        console.log(">>>>>>>>canvas user stream", canvasTrack);
+    })
+}
+
 //jitsi serer config
 $(window).bind('beforeunload', unload);
 $(window).bind('unload', unload);

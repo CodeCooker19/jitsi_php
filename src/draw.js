@@ -2,6 +2,7 @@
 var canvas = document.getElementById('drawCanvas');
 var ctx = canvas.getContext('2d');
 var color = "red";
+var lineWidth = '3';
 var isDrawFlag = false;
 // var color = document.querySelector(':checked').getAttribute('data-color');
 
@@ -9,7 +10,7 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight * 0.9;
 
 ctx.strokeStyle = color;
-ctx.lineWidth = '3';
+ctx.lineWidth = lineWidth;
 ctx.lineCap = ctx.lineJoin = 'round';
 
 /* Mouse and touch events */
@@ -32,17 +33,25 @@ canvas.addEventListener(moveEvent, draw, false);
 canvas.addEventListener(upEvent, endDraw, false);
 
 function displayWindowSize() {
+    var oldWidth = canvas.width;
+    var oldHeight = canvas.height;
     const context = canvas.getContext('2d');
-    let temp = context.getImageData(canvas.width, canvas.height)
+    let temp = context.getImageData(0, 0, canvas.width, canvas.height)
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight * 0.9;
-    context.putImageData(temp,0,0)
+
+    var ratio1 = oldWidth / canvas.width;
+    var ratio2 = oldHeight / canvas.height;
+    context.putImageData(temp, 0, 0)
+    context.scale(ratio1, ratio2);
+    context.lineWidth = lineWidth;
 }
 
 function drawBoard() {
     isDrawFlag = true;
     $('#draw_start_button').attr('disabled', true);
     $('#draw_stop_button').attr('disabled', false);
+    startCanvasStream();
 }
 
 function stopDraw() {
