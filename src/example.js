@@ -234,24 +234,27 @@ function onAudioLevelChanged(userID, audioLeveld) {
         return;
     }
 
-    if (localTracks[1].getParticipantId() === userID) {
-        console.log(">>>>local audio level changed------");
-        currentSpeakerId = userID;
-        localTracks[1].attach($(`#currentVideo`)[0]);
-    }
-    else {
-        if (!remoteTracks[userID]) {
+    if (localTracks[1]) {
+        if (localTracks[1].getParticipantId() === userID) {
+            console.log(">>>>local audio level changed------");
+            currentSpeakerId = userID;
+            localTracks[1].attach($(`#currentVideo`)[0]);
             return;
         }
+    }
 
-        currentSpeakerId = userID;
-        console.log(">>>>onAudioLevelChanged", audioLeveld, remoteTracks[userID]);
-        for (let i = 0; i < remoteTracks[userID].length; i++) {
-            if (remoteTracks[userID][i].getType() === "video") {
-                remoteTracks[userID][i].attach($(`#currentVideo`)[0]);
-            }
+    if (!remoteTracks[userID]) {
+        return;
+    }
+
+    currentSpeakerId = userID;
+    console.log(">>>>onAudioLevelChanged", audioLeveld, remoteTracks[userID]);
+    for (let i = 0; i < remoteTracks[userID].length; i++) {
+        if (remoteTracks[userID][i].getType() === "video") {
+            remoteTracks[userID][i].attach($(`#currentVideo`)[0]);
         }
     }
+
 }
 
 /**
@@ -335,6 +338,7 @@ function showScreenShare() { // eslint-disable-line no-unused-vars
         localTracks[1].dispose();
         localTracks.pop();
     }
+
     JitsiMeetJS.createLocalTracks({
         devices: ['desktop']
     })
@@ -381,9 +385,6 @@ function showLocalCamera() {
         .catch(error => console.log(">>>>>showLocalCamera error", error));
 }
 
-function showWhiteBoard() {
-
-}
 /**
  *
  * @param selected
@@ -520,6 +521,10 @@ function handleRecordButtons() {
 
 function selectedLocalTrack() {
     console.log(">>>>selectedLocalTrack clicked");
+    if (!localTracks[1]) {
+        return;
+    }
+
     if (currentSpeakerId == localTracks[1].getParticipantId()) {
         return;
     }

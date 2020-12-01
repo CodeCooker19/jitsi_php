@@ -1,11 +1,24 @@
 .line_div{
     margin-top: 3px;
 }
+#top_area{
+    margin-bottom: 5px
+}
+#current-area{
+    position: relative;
+    display: flex;
+    width: 100%;
+    height: 90vh;
+}
 #currentVideo {
     width: 100%;
     background: black;
+}
+#drawCanvas{
+    background: transparent;
+    position: absolute;
+    width: 100%;
     height: 90vh;
-    margin-top: 10px;
 }
 #hand_img{
     width: 20px;

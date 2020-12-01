@@ -8,10 +8,8 @@
     <script src="libs/jquery-2.1.1.min.js"></script>
     <!-- <script src="libs/strophe/strophe.js"></script>
     <script src="libs/strophe/strophe.disco.min.js?v=1"></script> -->
-    <link rel="stylesheet"
-          href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
-          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
-          crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <script src='https://meet.jit.si/external_api.js'></script>
     <script src="https://cdn.jsdelivr.net/npm/strophe.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/strophejs-plugin-disco/lib/strophe.disco.js?v=1"></script>
@@ -20,34 +18,42 @@
 </head>
 
 <body>
-    <div class="col-md-12">
+    <div class="col-md-12" id="top_area">
         <div class="form-inline">
             <span class="label label-success" id="broadcastingInfo"
                 style="font-size: 14px; display: none">Connected</span>
         </div>
         <div class="form-check form-check-inline mt-2 line_div">
-            <button id="turn_off_camera_button" class="btn btn-primary" onclick="turnOffLocalCamera()">Turn off Camera</button>
-            <button id="turn_on_camera_button" disabled class="btn btn-primary" onclick="turnOnLocalCamera()">Turn on Camera</button>
+            <button id="turn_off_camera_button" class="btn btn-primary" onclick="turnOffLocalCamera()">Turn off
+                Camera</button>
+            <button id="turn_on_camera_button" disabled class="btn btn-primary" onclick="turnOnLocalCamera()">Turn on
+                Camera</button>
 
             <button id="mute_mic_button" class="btn btn-primary" onclick="muteLocalMic()">Mute Local Mic</button>
-            <button id="unmute_mic_button" disabled class="btn btn-primary" onclick="unmuteLocalMic()">Unmute Local Mic</button>
+            <button id="unmute_mic_button" disabled class="btn btn-primary" onclick="unmuteLocalMic()">Unmute Local
+                Mic</button>
 
             <button id="record_start_button" class="btn btn-primary" onclick="startRecord()">Record Start</button>
             <button id="record_stop_button" disabled class="btn btn-primary" onclick="stopRecord()">Record Stop</button>
             <button id="hand_button" class="btn btn-primary" onclick="handleHandup()">
-                <img id="hand_img" src="./assets/image/hand.png"/>
+                <img id="hand_img" src="./assets/image/hand.png" />
             </button>
         </div>
 
         <div class="form-check form-check-inline mt-2 line_div">
             <button id="video_switch_button" class="btn btn-primary" onclick="showLocalCamera()">Local Camera</button>
             <button id="video_switch_button" class="btn btn-primary" onclick="showScreenShare()">Screen Share</button>
-            <button id="white_board_button" class="btn btn-primary" onclick="showWhiteBoard()">White Board</button>
             <select id="audioOutputSelect" onchange="changeAudioOutput(this)"></select>
+            <button id="draw_start_button" class="btn btn-primary" onclick="drawBoard()">Start Draw</button>
+            <button id="draw_stop_button" class="btn btn-primary" onclick="stopDraw()">Stop Draw</button>
+            <button id="draw_clear_button" class="btn btn-primary" onclick="clearDraw()">Clear Draw</button>
         </div>
     </div>
-    <video id="currentVideo" autoplay="true"></video>
-    <audio id="currentAudio" autoplay="true" muted="true"></audio>
+    <div id="current-area">
+        <video id="currentVideo" autoplay="true"></video>
+        <audio id="currentAudio" autoplay="true" muted="true"></audio>
+        <canvas id="drawCanvas">Canvas is not supported on this browser!</canvas>
+    </div>
     <div id="videoitem_area">
         <div id="local_area">
             <div class="title_div local_title">
@@ -65,6 +71,7 @@
             </div>
         </div>
     </div>
+    <script src="./draw.js"></script>
 </body>
 
 </html>
