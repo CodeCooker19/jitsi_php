@@ -136,7 +136,7 @@ function onRemoteTrack(track) {
     }
 
     if (remoteHands[participant]) {
-        let img = remoteHands[participant][0] ? './assets/image/hand.png' : '';
+        let img = remoteHands[participant][0] === true ? './assets/image/hand.png' : '';
         $(`#${participant} .hand`).attr('src', img);
     }
 
@@ -181,6 +181,10 @@ function onConferenceJoined() {
  */
 function onUserLeft(id) {
     console.log('>>>user left1', id);
+    if (remoteHands[id]) {
+        delete remoteHands[id];
+    }
+
     if (!remoteTracks[id]) {
         return;
     }
@@ -376,6 +380,10 @@ function showLocalCamera() {
         })
         .catch(error => console.log(">>>>>showLocalCamera error", error));
 }
+
+function showWhiteBoard() {
+
+}
 /**
  *
  * @param selected
@@ -420,7 +428,7 @@ function handleParticipantPropertyChange(participant, propertyName, oldValue, ne
         remoteHands[participantId][0] = flag;
     }
 
-    setRemoteHandImage(participantId, true);
+    setRemoteHandImage(participantId, flag);
 }
 
 function turnOffLocalCamera() {
