@@ -277,7 +277,7 @@ function onAudioLevelChanged(userID, audioLeveld) {
  * That function is called when connection is established successfully
  */
 function onConnectionSuccess() {
-    room = connection.initJitsiConference('Test', confOptions);
+    room = connection.initJitsiConference('test', confOptions);
     room.on(JitsiMeetJS.events.conference.TRACK_ADDED, onRemoteTrack);
     room.on(JitsiMeetJS.events.conference.TRACK_REMOVED, onRemoveTrack);
     room.on(
