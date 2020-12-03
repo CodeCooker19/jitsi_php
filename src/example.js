@@ -1,16 +1,32 @@
 /* global $, JitsiMeetJS */
 
+// const options = {
+//     websocket: 'wss://beta.meet.jit.si/xmpp-websocket',
+//     hosts: {
+//         domain: 'beta.meet.jit.si',
+//         muc: 'conference.beta.meet.jit.si', // FIXME: use XEP-0030
+//         focus: 'focus.beta.meet.jit.si',
+//         call_control: 'callcontrol.beta.meet.jit.si',
+//         jirecon: 'jirecon.beta.meet.jit.si',
+//     },
+//     bosh: '//beta.meet.jit.si/http-bind', // FIXME: use xep-0156 for that
+//     clientNode: "https://beta.jitsi.org/jitsimeet",
+//     useStunTurn: true
+// };
+
 const options = {
-    serviceUrl: 'wss://beta.meet.jit.si/xmpp-websocket',
     hosts: {
-        domain: 'beta.meet.jit.si',
-        muc: 'conference.beta.meet.jit.si', // FIXME: use XEP-0030
-        focus: 'focus.beta.meet.jit.si',
-        call_control: 'callcontrol.beta.meet.jit.si',
-        jirecon: 'jirecon.beta.meet.jit.si',
+        // XMPP domain.
+        domain: 'jitsi.videoqa.com',
+        muc: 'conference.jitsi.videoqa.com'
     },
-    bosh: '//beta.meet.jit.si/http-bind', // FIXME: use xep-0156 for that
-    clientNode: "https://beta.jitsi.org/jitsimeet",
+
+    // BOSH URL. FIXME: use XEP-0156 to discover it.
+    bosh: '//jitsi.videoqa.com/http-bind',
+
+    // Websocket URL
+    // websocket: 'wss://jitsi.videoqa.com/xmpp-websocket',
+    clientNode: 'http://jitsi.org/jitsimeet',
     useStunTurn: true
 };
 
@@ -19,11 +35,11 @@ const confOptions = {
 };
 
 const initOptions = {
-    enableTalkWhileMuted: true,
-    enableNoAudioDetection: true,
-    enableNoisyMicDetection: true,
+    // enableTalkWhileMuted: true,
+    // enableNoAudioDetection: true,
+    // enableNoisyMicDetection: true,
     disableAudioLevels: false,
-    enableAnalyticsLogging: false
+    // enableAnalyticsLogging: false
 }
 
 let connection = null;
@@ -261,7 +277,7 @@ function onAudioLevelChanged(userID, audioLeveld) {
  * That function is called when connection is established successfully
  */
 function onConnectionSuccess() {
-    room = connection.initJitsiConference('123123', confOptions);
+    room = connection.initJitsiConference('Test', confOptions);
     room.on(JitsiMeetJS.events.conference.TRACK_ADDED, onRemoteTrack);
     room.on(JitsiMeetJS.events.conference.TRACK_REMOVED, onRemoveTrack);
     room.on(
@@ -593,20 +609,21 @@ function setRemoteHandImage(participant, flag) {
 }
 
 function startCanvasStream() {
-    var canvas = document.getElementById('drawCanvas');
-    let canvasTrack = canvas.captureStream(25).getTracks()[0];
-    console.log(">>>>>>>>canvas stream", canvasTrack);
+    // var canvas = document.getElementById('drawCanvas');
+    // // let canvasTrack = canvas.captureStream(25).getTracks()[0];
+    // // console.log(">>>>>>>>canvas stream", canvasTrack);
 
-    room.addTrack(canvasTrack);
+    // // room.addTrack(canvasTrack);
 
-    navigator.mediaDevices.getUserMedia({video: true})
-      .then(stream => {
-        let canvstrm = canvas.captureStream();
-        // get track from the canvas stream and add to the user media stream
-        let canvstrmtrack = canvstrm.getTracks()[0]
-        stream.addTrack(canvstrmtrack);
-        console.log(">>>>>>>>canvas user stream", canvasTrack);
-    })
+    // navigator.mediaDevices.getUserMedia({video: true})
+    //   .then(stream => {
+    //     let canvstrm = canvas.captureStream(25);
+    //     // get track from the canvas stream and add to the user media stream
+    //     let canvstrmtrack = canvstrm.getTracks()[0]
+    //     stream.addTrack(canvstrmtrack);
+    //     console.log(">>>>>>>>canvas user stream", canvasTrack);
+    //     room.addTrack(canvasTrack);
+    // })
 }
 
 //jitsi serer config
